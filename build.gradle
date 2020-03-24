@@ -5,6 +5,10 @@ plugins {
     id 'jacoco'
 }
 
+ext{
+    mapstructVersion = "1.3.1.Final"
+}
+
 group = 'guru.springfamework'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
@@ -30,9 +34,20 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
+    implementation "org.mapstruct:mapstruct-jdk8:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+}
+
+//Needed to create mappers as Spring Components
+compileJava {
+    options.annotationProcessorPath = configurations.annotationProcessor
+
+    // if you need to configure mapstruct component model
+    options.compilerArgs << "-Amapstruct.defaultComponentModel=spring"
 }
 
 test {
