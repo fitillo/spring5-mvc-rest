@@ -8,16 +8,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CategoryMapperTest {
 
+    public static final String FRUIT = "Fruit";
+    public static final long ID = 1l;
     final CategoryMapper mapper = CategoryMapper.INSTANCE;
 
     @Test
     void categoryToCategoryDTO() {
         //given, when
-        CategoryDTO dto = mapper.categoryToCategoryDTO(Category.builder().id(1L).name("Fruit").build());
+        CategoryDTO dto = mapper.categoryToCategoryDTO(Category.builder().id(ID).name(FRUIT).build());
 
         //then
         assertNotNull(dto);
-        assertEquals(1l, dto.getId());
-        assertEquals("Fruit", dto.getName());
+        assertEquals(ID, dto.getId());
+        assertEquals(FRUIT, dto.getName());
     }
 }
