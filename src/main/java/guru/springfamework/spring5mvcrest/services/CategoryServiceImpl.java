@@ -39,10 +39,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Stream<CategoryDTO> getCategoryByName(String name) {
-        List<Category> categories = this.repository.getCategoriesByNameLikeOrderByName(name);
-
-
+    public Stream<CategoryDTO> getCategoriesByName(String name) {
+        List<Category> categories = this.repository.getCategoriesByNameLikeOrderByName(name+"%");
 
         return categories.isEmpty() ?
                 Stream.empty() :

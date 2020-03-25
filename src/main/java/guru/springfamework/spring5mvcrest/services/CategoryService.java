@@ -11,5 +11,5 @@ public interface CategoryService {
 
     Optional<CategoryDTO> getCategoryById(Long id);
 
-    Stream<CategoryDTO> getCategoryByName(String name);
+    Stream<CategoryDTO> getCategoriesByName(String name);
 }

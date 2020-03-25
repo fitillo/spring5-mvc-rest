@@ -100,7 +100,7 @@ class CategoryServiceTest {
         when(repository.getCategoriesByNameLikeOrderByName(anyString())).thenReturn(Collections.singletonList(categories.get(0)));
 
         //when
-        Stream<CategoryDTO> result = service.getCategoryByName(FRUIT);
+        Stream<CategoryDTO> result = service.getCategoriesByName(FRUIT);
 
         //then
         List<CategoryDTO> dtos = result
@@ -120,7 +120,7 @@ class CategoryServiceTest {
         when(repository.getCategoriesByNameLikeOrderByName(anyString())).thenReturn(new ArrayList<>());
 
         //when
-        Stream<CategoryDTO> dtos = service.getCategoryByName(FRUIT);
+        Stream<CategoryDTO> dtos = service.getCategoriesByName(FRUIT);
 
         //then
         assertEquals(0, dtos.count());
