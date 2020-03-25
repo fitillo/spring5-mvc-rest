@@ -69,7 +69,10 @@ class CategoryServiceTest {
     @Test
     void getCategoryById() {
         //given
-        when(repository.findById(anyLong())).thenReturn(Optional.of(categories.get(0)));
+        Category cat = new Category();
+        cat.setId(ID);
+        cat.setName(FRUIT);
+        when(repository.findById(anyLong())).thenReturn(Optional.of(cat));
 
         //when
         Optional<CategoryDTO> dto = service.getCategoryById(ID);
