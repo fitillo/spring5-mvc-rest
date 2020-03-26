@@ -7,7 +7,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomerMapper implements Converter<Customer, CustomerDTO> {
+public class CustomerMapperToDTO implements Converter<Customer, CustomerDTO> {
 
     @Value("${v1.customer.url}")
     private String url;
@@ -15,8 +15,8 @@ public class CustomerMapper implements Converter<Customer, CustomerDTO> {
     @Override
     public CustomerDTO convert(Customer source) {
         return CustomerDTO.builder()
-                .firstname(source.getFirstName())
-                .lastname(source.getLastName())
+                .firstName(source.getFirstName())
+                .lastName(source.getLastName())
                 .customerUrl(url+"/"+source.getId())
                 .build();
     }

@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith({MockitoExtension.class})
-class CustomerMapperTest {
+class CustomerMapperToDTOTest {
 
     private static final String BOB = "Bob";
     private static final long ID = 1l;
     private static final String JOHNSON = "Johnson";
-    private final CustomerMapper mapper = new CustomerMapper();
+    private final CustomerMapperToDTO mapper = new CustomerMapperToDTO();
     private static final String URL = "/api/v1/customers";
 
     @BeforeEach
@@ -32,8 +32,8 @@ class CustomerMapperTest {
 
         //then
         assertNotNull(dto);
-        assertEquals(BOB, dto.getFirstname());
-        assertEquals(JOHNSON, dto.getLastname());
+        assertEquals(BOB, dto.getFirstName());
+        assertEquals(JOHNSON, dto.getLastName());
         assertEquals(URL+"/"+ID, dto.getCustomerUrl());
     }
 }

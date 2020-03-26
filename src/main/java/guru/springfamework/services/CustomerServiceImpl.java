@@ -1,7 +1,9 @@
 package guru.springfamework.services;
 
-import guru.springfamework.api.v1.mapper.CustomerMapper;
+import guru.springfamework.api.v1.mapper.CustomerDTOMapperToCustomer;
+import guru.springfamework.api.v1.mapper.CustomerMapperToDTO;
 import guru.springfamework.api.v1.model.CustomerDTO;
+import guru.springfamework.domain.Customer;
 import guru.springfamework.repositories.CustomerRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,22 +14,30 @@ import java.util.stream.Stream;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository repository;
-    private final CustomerMapper mapper;
+    private final CustomerMapperToDTO mapperToDTO;
+    private final CustomerDTOMapperToCustomer mapperToCustomer;
 
-    public CustomerServiceImpl(CustomerRepository repository, CustomerMapper mapper) {
+    public CustomerServiceImpl(CustomerRepository repository, CustomerMapperToDTO mapperToDTO,
+                               CustomerDTOMapperToCustomer mapperToCustomer) {
         this.repository = repository;
-        this.mapper = mapper;
+        this.mapperToDTO = mapperToDTO;
+        this.mapperToCustomer = mapperToCustomer;
     }
 
     @Override
     public Stream<CustomerDTO> getAllCustomers() {
         return repository.findAll()
                 .stream()
-                .map(mapper::convert);
+                .map(mapperToDTO::convert);
     }
 
     @Override
     public Optional<CustomerDTO> getCustomerById(Long id) {
-        return repository.findById(id).map(mapper::convert);
+        return repository.findById(id).map(mapperToDTO::convert);
+    }
+
+    @Override
+    public CustomerDTO createNewCustomer(CustomerDTO customerDTO) {
+        return mapperToDTO.convert(repository.save(mapperToCustomer.convert(customerDTO)));
     }
 }
