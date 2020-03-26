@@ -18,8 +18,4 @@ public class BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
-    public boolean isNew() {
-        return this.id == null;
-    }
 }
