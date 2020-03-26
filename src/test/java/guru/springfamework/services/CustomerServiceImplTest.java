@@ -71,13 +71,13 @@ class CustomerServiceImplTest {
         when(repository.findById(anyLong())).thenReturn(Optional.of(customers.get(0)));
 
         //when
-        Optional<CustomerDTO> customerDTO = service.getCustomerById(ID);
+        Optional<CustomerDTO> customerDTO = service.getCustomerDTOById(ID);
 
         //then
         assertNotNull(customerDTO);
         assertTrue(customerDTO.isPresent());
         assertEquals(BOB, customerDTO.get().getFirstName());
-        assertEquals("/api/v1/customers/"+ID, customerDTO.get().getCustomerUrl());
+        assertEquals(URL+"/"+ID, customerDTO.get().getCustomerUrl());
         verify(repository).findById(anyLong());
     }
 
@@ -96,7 +96,50 @@ class CustomerServiceImplTest {
 
         //then
         assertEquals(customerDTO.getFirstName(), savedDto.getFirstName());
-        assertEquals("/api/v1/customers/1", savedDto.getCustomerUrl());
+        assertEquals(URL+"/1", savedDto.getCustomerUrl());
         verify(repository).save(any(Customer.class));
+    }
+
+    @Test
+    public void updateCustomer() throws Exception {
+
+        //given
+        CustomerDTO customerDTO = CustomerDTO.builder().firstName("Jim").build();
+
+        Customer savedCustomer = Customer.builder().firstName(customerDTO.getFirstName())
+                .lastName(customerDTO.getLastName()).id(ID).build();
+
+        when(repository.findById(anyLong())).thenReturn(Optional.of(mapperToCustomer.convert(customerDTO)));
+        when(repository.save(any(Customer.class))).thenReturn(savedCustomer);
+
+        //when
+        Optional<CustomerDTO> savedDto = service.updateCustomer(ID, customerDTO);
+
+        //then
+        assertTrue(savedDto.isPresent());
+        assertEquals(customerDTO.getFirstName(), savedDto.get().getFirstName());
+        assertEquals(URL+"/1", savedDto.get().getCustomerUrl());
+        verify(repository).findById(anyLong());
+        verify(repository).save(any());
+    }
+
+    @Test
+    public void updateCustomerNotFound() throws Exception {
+
+        //given
+        CustomerDTO customerDTO = CustomerDTO.builder().firstName("Jim").build();
+
+        Customer savedCustomer = Customer.builder().firstName(customerDTO.getFirstName())
+                .lastName(customerDTO.getLastName()).id(ID).build();
+
+        when(repository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when
+        Optional<CustomerDTO> savedDto = service.updateCustomer(ID, customerDTO);
+
+        //then
+        assertTrue(savedDto.isEmpty());
+        verify(repository).findById(anyLong());
+        verify(repository, times(0)).save(any());
     }
 }

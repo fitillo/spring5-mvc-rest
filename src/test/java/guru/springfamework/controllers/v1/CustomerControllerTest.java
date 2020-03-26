@@ -18,17 +18,19 @@ import java.util.stream.Stream;
 
 import static guru.springfamework.controllers.v1.AbstractRestControllerTest.asJsonString;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class CustomerControllerTest {
 
+    public static final String CUSTOMERS_1 = "/api/v1/customers/1";
+    public static final String CUSTOMERS = "/api/v1/customers";
     @InjectMocks
     private CustomerController controller;
 
@@ -50,7 +52,7 @@ class CustomerControllerTest {
         when(service.getAllCustomers()).thenReturn(customers);
 
         //then
-        mockMvc.perform(get("/api/v1/customers").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(CUSTOMERS).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customers", hasSize(2)));
         verify(service).getAllCustomers();
@@ -60,13 +62,13 @@ class CustomerControllerTest {
     void getCustomerById() throws Exception {
         //given
         Optional<CustomerDTO> customerDTO = Optional.of(CustomerDTO.builder().firstName("Bob").build());
-        when(service.getCustomerById(anyLong())).thenReturn(customerDTO);
+        when(service.getCustomerDTOById(anyLong())).thenReturn(customerDTO);
 
         //then
-        mockMvc.perform(get("/api/v1/customers/1").contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get(CUSTOMERS_1).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstname", is("Bob")));
-        verify(service).getCustomerById(anyLong());
+        verify(service).getCustomerDTOById(anyLong());
     }
 
     @Test
@@ -84,14 +86,45 @@ class CustomerControllerTest {
         when(service.createNewCustomer(ArgumentMatchers.any())).thenReturn(returnDTO);
 
         //when/then
-        mockMvc.perform(post("/api/v1/customers/")
+        mockMvc.perform(post(CUSTOMERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(customer)))
                 //.andReturn().getResponse().getContentAsString();
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.firstname", equalTo("Fred")))
-                .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/1")));
+                .andExpect(jsonPath("$.customer_url", equalTo(CUSTOMERS_1)));
 
         /*System.out.println(response);*/
+    }
+
+    @Test
+    public void testUpdateCustomer() throws Exception {
+        //given
+        CustomerDTO customer = CustomerDTO.builder().firstName("Fred").lastName("Flintstone").build();
+
+        CustomerDTO returnDTO = CustomerDTO.builder().firstName(customer.getFirstName())
+                .lastName(customer.getLastName()).customerUrl(CUSTOMERS_1).build();
+
+        when(service.updateCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(Optional.of(returnDTO));
+
+        //when/then
+        mockMvc.perform(put(CUSTOMERS_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(customer)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstname", equalTo("Fred")))
+                .andExpect(jsonPath("$.lastname", equalTo("Flintstone")))
+                .andExpect(jsonPath("$.customer_url", equalTo(CUSTOMERS_1)));
+    }
+
+    @Test
+    void updateCustomerNotFound() throws Exception {
+        CustomerDTO customer = CustomerDTO.builder().firstName("Fred").lastName("Flintstone").build();
+        when(service.updateCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(put(CUSTOMERS_1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(customer)))
+                .andExpect(status().isNotFound());
     }
 }

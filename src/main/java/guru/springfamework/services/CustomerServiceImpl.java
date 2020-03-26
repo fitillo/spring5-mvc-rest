@@ -32,12 +32,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Optional<CustomerDTO> getCustomerById(Long id) {
+    public Optional<CustomerDTO> getCustomerDTOById(Long id) {
         return repository.findById(id).map(mapperToDTO::convert);
     }
 
     @Override
     public CustomerDTO createNewCustomer(CustomerDTO customerDTO) {
         return mapperToDTO.convert(repository.save(mapperToCustomer.convert(customerDTO)));
+    }
+
+    @Override
+    public Optional<CustomerDTO> updateCustomer(Long id, CustomerDTO customerDTO) {
+        Customer customer = mapperToCustomer.convert(customerDTO);
+        customer.setId(id);
+        return repository.findById(id).isEmpty()
+                ? Optional.empty()
+                : Optional.of(mapperToDTO.convert(repository.save(customer)));
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Optional;
 
@@ -30,7 +29,7 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long id) {
-        Optional<CustomerDTO> customerDTO = service.getCustomerById(id);
+        Optional<CustomerDTO> customerDTO = service.getCustomerDTOById(id);
         return customerDTO.isEmpty() ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(customerDTO.get(), HttpStatus.OK);
     }
 
@@ -38,10 +37,14 @@ public class CustomerController {
     public ResponseEntity<CustomerDTO> createNewCustomer(@RequestBody CustomerDTO customerDTO) {
         return new ResponseEntity<CustomerDTO>(service.createNewCustomer(customerDTO),
                 HttpStatus.CREATED);
-        /*CustomerDTO createdCustomer = service.createNewCustomer(customerDTO);
+    }
 
-        return ResponseEntity.created(ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(createdCustomer.getCustomerUrl()).toUri()).build();*/
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO) {
+        Optional<CustomerDTO> customerDTOOptional = service.updateCustomer(id, customerDTO);
+
+        return customerDTOOptional.isEmpty()
+                ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+                : new ResponseEntity<>(customerDTOOptional.get(), HttpStatus.OK);
     }
 }
