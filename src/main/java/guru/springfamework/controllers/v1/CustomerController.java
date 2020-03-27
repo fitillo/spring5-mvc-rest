@@ -47,4 +47,12 @@ public class CustomerController {
                 ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(customerDTOOptional.get(), HttpStatus.OK);
     }
+
+    @PatchMapping({"/{id}"})
+    public ResponseEntity<CustomerDTO> patchCustomer(@PathVariable Long id, @RequestBody CustomerDTO customerDTO){
+        Optional<CustomerDTO> customerDTOOptional = service.patchCustomer(id, customerDTO);
+        return customerDTOOptional.isEmpty()
+                ? new ResponseEntity<>(HttpStatus.NOT_FOUND)
+                : new ResponseEntity<>(customerDTOOptional.get(), HttpStatus.OK);
+    }
 }

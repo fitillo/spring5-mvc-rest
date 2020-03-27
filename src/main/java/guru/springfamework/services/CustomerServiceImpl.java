@@ -49,4 +49,20 @@ public class CustomerServiceImpl implements CustomerService {
                 ? Optional.empty()
                 : Optional.of(mapperToDTO.convert(repository.save(customer)));
     }
+
+    @Override
+    public Optional<CustomerDTO> patchCustomer(Long id, CustomerDTO customerDTO) {
+        return Optional.of(repository.findById(id).map(customer -> {
+
+            if(customerDTO.getFirstName() != null){
+                customer.setFirstName(customerDTO.getFirstName());
+            }
+
+            if(customerDTO.getLastName() != null){
+                customer.setLastName(customerDTO.getLastName());
+            }
+
+            return mapperToDTO.convert(repository.save(customer));
+        })).orElse(Optional.empty());
+    }
 }
