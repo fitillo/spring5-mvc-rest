@@ -72,6 +72,15 @@ class CustomerControllerTest {
     }
 
     @Test
+    void getCustomerByIdNotFound() throws Exception {
+        when(service.getCustomerDTOById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(get(CUSTOMERS_1).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+        verify(service).getCustomerDTOById(anyLong());
+    }
+
+    @Test
     public void createNewCustomer() throws Exception {
         //given
         CustomerDTO customer = new CustomerDTO();
@@ -129,7 +138,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    public void testPatchCustomer() throws Exception {
+    void testPatchCustomer() throws Exception {
 
         //given
         CustomerDTO customer = new CustomerDTO();
@@ -138,16 +147,27 @@ class CustomerControllerTest {
         CustomerDTO returnDTO = new CustomerDTO();
         returnDTO.setFirstName(customer.getFirstName());
         returnDTO.setLastName("Flintstone");
-        returnDTO.setCustomerUrl("/api/v1/customers/1");
+        returnDTO.setCustomerUrl(CUSTOMERS_1);
 
         when(service.patchCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(Optional.of(returnDTO));
 
-        mockMvc.perform(patch("/api/v1/customers/1")
+        mockMvc.perform(patch(CUSTOMERS_1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(customer)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstname", equalTo("Fred")))
                 .andExpect(jsonPath("$.lastname", equalTo("Flintstone")))
                 .andExpect(jsonPath("$.customer_url", equalTo("/api/v1/customers/1")));
+    }
+
+    @Test
+    void testPatchCustomerNotFound() throws Exception {
+        CustomerDTO customerDTO = CustomerDTO.builder().firstName("Fred").build();
+        when(service.patchCustomer(anyLong(), any(CustomerDTO.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(patch(CUSTOMERS_1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(customerDTO)))
+                .andExpect(status().isNotFound());
     }
 }
